@@ -101,22 +101,38 @@ class Drawing {
         // if the mouse is over the canvas, it's position is here, otherwise it's null
         // add code to deal with the mouse position each render frame
         if (this.mousePosition) {
-
+            this.points.addPoint(this.mousePosition);
         } else {
 
         }
 
         // add code to draw rectangles we have so far at the back
-        
+        this.rects.forEach(element => {
+            var width = element.p1.x - element.p2.x
+            var height = element.p1.y - element.p2.y
+            this.ctx.strokeRect(element.p1.x, element.p1.y, width, height)
+        });
 
 
         // add code to draw points with the oldest ones more transparent 
-
+        for (let index = 0; index < this.points.length; index++) {
+            var element = this.points.getPoint(index)
+            this.ctx.strokeRect(element.x, element.y, 0 ,0)
+        }
         
 
         // if we've clicked, add code draw the rubber band
         if (this.clickStart) {
-
+            if (this.mousePosition) {
+                this.rects.pop();
+                let rect:Rectangle = {p1: this.clickStart, p2:this.mousePosition, color: randomColor()};
+                this.rects.push(rect);
+                this.ctx.strokeRect(this.clickStart.x, this.clickStart.y, 
+                    this.clickStart.x - this.mousePosition.x, this.clickStart.y - this.mousePosition.y)
+            } else {
+                this.rects.pop();
+                this.clickStart = null
+            }
         }
 
         // do it again!  and again!  AND AGAIN!  AND ...       
@@ -147,6 +163,8 @@ class Drawing {
 
             // **** TODO *****
             // add code here to react to mouse up events
+            this.clickStart = null
+            this.mousePosition = clickEnd
         }
         
         canv.onmousemove = (ev: MouseEvent) => {
