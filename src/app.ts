@@ -19,6 +19,27 @@ function darken(color: Color) {
     return color.darken(0.25)   // creates a new color
 }
 
+function drawTriangle(p1:ps.MousePosition, p2: ps.MousePosition, p3:ps.MousePosition, color:Color, ctx:CanvasRenderingContext2D, step:number){
+    var midPoint1:ps.MousePosition = {x: (p2.x - p1.x)/2 + p1.x, y: (p2.y - p1.y)/2 + p1.y};
+    var midPoint2:ps.MousePosition = {x: (p3.x - p1.x)/2 + p1.x, y: (p3.y - p1.y)/2 + p1.y};
+    var midPoint3:ps.MousePosition = {x: (p3.x - p2.x)/2 + p2.x, y: (p3.y - p2.y)/2 + p2.y};
+    var original = ctx.fillStyle
+    ctx.fillStyle = color.toString()
+    ctx.beginPath()
+    ctx.moveTo(midPoint1.x, midPoint1.y)
+    ctx.lineTo(midPoint2.x, midPoint2.y)
+    ctx.lineTo(midPoint3.x, midPoint3.y)
+    ctx.lineTo(midPoint1.x, midPoint1.y)
+    ctx.stroke()
+    ctx.fill()
+    ctx.closePath()
+    if (step > 0) {
+        drawTriangle(p1, midPoint1, midPoint2, darken(color), ctx, step-1);
+        drawTriangle(midPoint1, p2, midPoint3, darken(color), ctx, step-1);
+        drawTriangle(midPoint2, midPoint3, p3, darken(color), ctx, step-1);
+    }
+}
+
 // an interface that describes what our Rectangle object might look like.  
 // Remember, a Typescript interface is just a description of the required
 // properties (and methods, although we don't use methods here) an object
@@ -103,11 +124,15 @@ class Drawing {
         if (this.mousePosition) {
             this.points.addPoint(this.mousePosition);
         } else {
-            this.points.dropPoint();
+            if (this.points.length > 0) {
+                this.points.dropPoint();
+            }
         }
 
         // add code to draw rectangles we have so far at the back
         this.rects.forEach(element => {
+            var container = this.ctx.lineWidth
+            this.ctx.lineWidth = 2
             var width = - element.p1.x + element.p2.x;
             var height = - element.p1.y + element.p2.y;
             this.ctx.strokeRect(element.p1.x, element.p1.y, width, height);
@@ -118,14 +143,35 @@ class Drawing {
             this.ctx.lineTo(element.p2.x - width, element.p2.y);
             this.ctx.stroke();
             this.ctx.closePath();
+            this.ctx.lineWidth = container
+            var centerPoint:ps.MousePosition = {x: element.p1.x + width/2, y: element.p1.y + height/2};
+            var p1 = element.p1
+            var p2:ps.MousePosition = {x: p1.x + width, y:p1.y}
+            var p3:ps.MousePosition = {x:p2.x, y:p2.y + height}
+            var p4:ps.MousePosition = {x: p1.x, y:p1.y + height}
+            var smaller = Math.min(Math.abs(width), Math.abs(height));
+            var step = Math.floor(smaller/128)
+            var check = smaller%128
+            if (check == 0) {
+                step = step - 1;
+            }
+            drawTriangle(centerPoint, p1, p2, element.color, this.ctx, step);
+            drawTriangle(centerPoint, p2, p3, element.color, this.ctx, step);
+            drawTriangle(centerPoint, p3, p4, element.color, this.ctx, step);
+            drawTriangle(centerPoint, p4, p1, element.color, this.ctx, step);
         });
 
 
         // add code to draw points with the oldest ones more transparent 
-        for (let index = 0; index < this.points.length; index++) {
+        var container = this.ctx.strokeStyle
+        var dotColor = Color('blue')
+        this.ctx.fillStyle = dotColor.toString();
+        for (let index = this.points.length - 1; index >= 0; index--) {
             var element = this.points.getPoint(index);
-            this.ctx.strokeRect(element.x, element.y, 1 ,1);
+            this.ctx.fillRect(element.x, element.y, 2 ,2);
+            this.ctx.fillStyle = dotColor.fade(.7).toString()
         }
+        this.ctx.fillStyle = container
         
 
         // if we've clicked, add code draw the rubber band
@@ -167,12 +213,11 @@ class Drawing {
             // **** TODO *****
             // add code here to react to mouse up events
             if (this.clickStart) {
-                let rect:Rectangle = 
-                {p1: this.clickStart, p2:clickEnd, color: randomColor()};
-                this.rects.push(rect)
+                let rect:Rectangle = {p1: this.clickStart, p2:clickEnd, color: randomColor()};
+                this.rects.push(rect);
+                this.clickStart = null;
             }
-            this.clickStart = null
-            this.mousePosition = clickEnd
+            this.mousePosition = clickEnd;
         }
         
         canv.onmousemove = (ev: MouseEvent) => {
