@@ -177,8 +177,11 @@ class Drawing {
         // if we've clicked, add code draw the rubber band
         if (this.clickStart) {
             if (this.mousePosition) {
+                var original = this.ctx.strokeStyle
+                this.ctx.strokeStyle = 'grey'
                 this.ctx.strokeRect(this.clickStart.x, this.clickStart.y, 
                     -this.clickStart.x + this.mousePosition.x, -this.clickStart.y + this.mousePosition.y);
+                this.ctx.strokeStyle = original
             } else {
                 this.clickStart = null;
             }
