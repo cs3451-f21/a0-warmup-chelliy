@@ -103,28 +103,28 @@ class Drawing {
         if (this.mousePosition) {
             this.points.addPoint(this.mousePosition);
         } else {
-            this.points.dropPoint()
+            this.points.dropPoint();
         }
 
         // add code to draw rectangles we have so far at the back
         this.rects.forEach(element => {
-            var width = - element.p1.x + element.p2.x
-            var height = - element.p1.y + element.p2.y
-            this.ctx.strokeRect(element.p1.x, element.p1.y, width, height)
-            this.ctx.beginPath()
-            this.ctx.moveTo(element.p1.x, element.p1.y)
-            this.ctx.lineTo(element.p2.x, element.p2.y)
-            this.ctx.moveTo(element.p1.x + width, element.p1.y)
-            this.ctx.lineTo(element.p2.x - width, element.p2.y)
-            this.ctx.stroke()
-            this.ctx.closePath()
+            var width = - element.p1.x + element.p2.x;
+            var height = - element.p1.y + element.p2.y;
+            this.ctx.strokeRect(element.p1.x, element.p1.y, width, height);
+            this.ctx.beginPath();
+            this.ctx.moveTo(element.p1.x, element.p1.y);
+            this.ctx.lineTo(element.p2.x, element.p2.y);
+            this.ctx.moveTo(element.p1.x + width, element.p1.y);
+            this.ctx.lineTo(element.p2.x - width, element.p2.y);
+            this.ctx.stroke();
+            this.ctx.closePath();
         });
 
 
         // add code to draw points with the oldest ones more transparent 
         for (let index = 0; index < this.points.length; index++) {
-            var element = this.points.getPoint(index)
-            this.ctx.strokeRect(element.x, element.y, 1 ,1)
+            var element = this.points.getPoint(index);
+            this.ctx.strokeRect(element.x, element.y, 1 ,1);
         }
         
 
@@ -132,9 +132,9 @@ class Drawing {
         if (this.clickStart) {
             if (this.mousePosition) {
                 this.ctx.strokeRect(this.clickStart.x, this.clickStart.y, 
-                    -this.clickStart.x + this.mousePosition.x, -this.clickStart.y + this.mousePosition.y)
+                    -this.clickStart.x + this.mousePosition.x, -this.clickStart.y + this.mousePosition.y);
             } else {
-                this.clickStart = null
+                this.clickStart = null;
             }
         }
 
