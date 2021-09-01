@@ -103,34 +103,37 @@ class Drawing {
         if (this.mousePosition) {
             this.points.addPoint(this.mousePosition);
         } else {
-
+            this.points.dropPoint()
         }
 
         // add code to draw rectangles we have so far at the back
         this.rects.forEach(element => {
-            var width = element.p1.x - element.p2.x
-            var height = element.p1.y - element.p2.y
+            var width = - element.p1.x + element.p2.x
+            var height = - element.p1.y + element.p2.y
             this.ctx.strokeRect(element.p1.x, element.p1.y, width, height)
+            this.ctx.beginPath()
+            this.ctx.moveTo(element.p1.x, element.p1.y)
+            this.ctx.lineTo(element.p2.x, element.p2.y)
+            this.ctx.moveTo(element.p1.x + width, element.p1.y)
+            this.ctx.lineTo(element.p2.x - width, element.p2.y)
+            this.ctx.stroke()
+            this.ctx.closePath()
         });
 
 
         // add code to draw points with the oldest ones more transparent 
         for (let index = 0; index < this.points.length; index++) {
             var element = this.points.getPoint(index)
-            this.ctx.strokeRect(element.x, element.y, 0 ,0)
+            this.ctx.strokeRect(element.x, element.y, 1 ,1)
         }
         
 
         // if we've clicked, add code draw the rubber band
         if (this.clickStart) {
             if (this.mousePosition) {
-                this.rects.pop();
-                let rect:Rectangle = {p1: this.clickStart, p2:this.mousePosition, color: randomColor()};
-                this.rects.push(rect);
                 this.ctx.strokeRect(this.clickStart.x, this.clickStart.y, 
-                    this.clickStart.x - this.mousePosition.x, this.clickStart.y - this.mousePosition.y)
+                    -this.clickStart.x + this.mousePosition.x, -this.clickStart.y + this.mousePosition.y)
             } else {
-                this.rects.pop();
                 this.clickStart = null
             }
         }
@@ -163,6 +166,11 @@ class Drawing {
 
             // **** TODO *****
             // add code here to react to mouse up events
+            if (this.clickStart) {
+                let rect:Rectangle = 
+                {p1: this.clickStart, p2:clickEnd, color: randomColor()};
+                this.rects.push(rect)
+            }
             this.clickStart = null
             this.mousePosition = clickEnd
         }
