@@ -1,4 +1,7 @@
 [![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-f059dc9a6f8d3a56e377f745f24479a46679e63a5d9fe6f495e02850cd0d8118.svg)](https://classroom.github.com/online_ide?assignment_repo_id=5470058&assignment_repo_type=AssignmentRepo)
+
+(Public only for jop application purpose, shouldn't be copyed as an answer)
+
 # Assignment 0:  Typescript, Web, Simple Graphics warmup 
 
 This repository implements the starting point of a small interactive program in TypeScript.
